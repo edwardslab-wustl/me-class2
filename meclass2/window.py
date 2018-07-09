@@ -8,6 +8,7 @@ Created on Sat Mar 10 19:59:13 2018
 import scipy
 import numpy as np
 import math
+#import sys
 
 
 class Window:
@@ -59,14 +60,18 @@ class Window:
         
     def downsample(self,x,r,b):
         x = np.array(x)
-        if (x.size % r) !=0:
+        if (x.size % int(r)) !=0:
             #if r < 3:
             #    r=3
-            pad_size = math.ceil(float(x.size)/r)*r-x.size
+            #pad_size = math.ceil(float(x.size)/r)*r-x.size
+            #x_pad = np.append(x,np.zeros(int(pad_size))*np.NaN)
+            pad_size = int(r) - (x.size % int(r))
             x_pad = np.append(x,np.zeros(pad_size)*np.NaN)
-            #print("ps:", str(pad_size), "x_len:", str(x_pad.shape), "r:", str(r), "x:", str(x.size), file=sys.stderr)
-            ds = scipy.nanmean(x_pad.reshape(-1,r),axis=1)
+            #print("1: ps:", str(pad_size), "x_len:", str(x_pad.shape), "r:", str(r), "x:", str(x.size), file=sys.stderr)
+            #ds = scipy.nanmean(x_pad.reshape(-1,int(r)),axis=1)
+            ds = np.nanmean(x_pad.reshape(-1,int(r)),axis=1)
         else:
+            #print("2: x_len:", str(x.shape), "r:", str(r), "x:", str(x.size), file=sys.stderr)
             ds = x.reshape(-1,int(r)).mean(axis=1)
             #ds = x.reshape(-1,r).mean(axis=1)
         #Average the remaining values if indivisible by bin size.
@@ -74,4 +79,5 @@ class Window:
             avg_lbs = np.mean(ds[b-1:])
             ds = ds[:b]
             ds[-1] = avg_lbs
+        #print("SIZE: ", str(len(ds)), file=sys.stderr)
         return list(ds)
