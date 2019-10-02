@@ -417,7 +417,7 @@ def setup_parser_arguments():
         formatter_class=argparse.RawDescriptionHelpFormatter,description='''
 Determine and plot results from ME-Class predictions.''')
     ### Required positional arguments
-    parser.add_argument('pred_files',nargs='+',help="1 or prediction files") 
+    parser.add_argument('pred_files',nargs='+',help="1 or more prediction files") 
     parser.add_argument('-o', '--outFileBase',dest='outFileBase',
         default='results',
         help="base tag for output files, default = \"results\"")

@@ -1685,8 +1685,11 @@ For multiple types of gene level interpolation and scaling of WGBS methylation d
             gene default (500) based on median size of protein coding gene in\
             ENSG. (WSG only) Default=500")        
     bin_group.add_argument('-m',"--proximalBins",dest="proximal_bins",default=125,type=int,
-            help="Number of bins to divide the proximal window into. (WSG & SGF\
+            help="Number of bins to divide the proximal window into. (WSG\
             only) Default=125")    
+#    bin_group.add_argument('-m',"--proximalBins",dest="proximal_bins",default=125,type=int,
+#            help="Number of bins to divide the proximal window into. (WSG & SGF\
+#            only) Default=125")    
 #    bin_group.add_argument('-e',"--exonBins",dest="exon_bins",default=10,type=int,
 #            help="Number of bins to divide the scaled exons into. (SGF only)\
 #            Default=10")

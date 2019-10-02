@@ -6,7 +6,7 @@ Created on Mon Mar 12 20:07:59 2018
 """
 
 class FilterFlags:
-    def __init__(self,annot_filetype="",only_simple_chrs=True,only_mrna=True,only_complete=False,only_uniq_tx_start=False,differential=False,collapse_on_common_name=True,exclude_lt_four_exons=True):
+    def __init__(self,annot_filetype="",only_simple_chrs=True,only_mrna=True,only_complete=True,only_uniq_tx_start=False,differential=False,collapse_on_common_name=True,exclude_lt_four_exons=False):
         ### Gene Annotation Format 
         self.annot_filetype = annot_filetype
         ### Transcript Level Filters        
