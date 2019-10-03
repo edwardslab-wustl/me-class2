@@ -458,7 +458,7 @@ Determine and plot results from ME-Class predictions.''')
             choices=["best","right"],
             default="best")
     advanced_plot_group.add_argument('--lineWidth',
-            help="Line width for plots, default=t.5",
+            help="Line width for plots, default=2.5",
             type=float,
             default=2.5)
     return parser
