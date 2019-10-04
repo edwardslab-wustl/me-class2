@@ -142,7 +142,8 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
     meth_cmap = sns.diverging_palette(240,10,n=15,as_cmap=True)            
     sample_cmap = plt.get_cmap("gnuplot2")
     sample_tags = [float(1)/(s+1) for s in S]    
-    cluster_cmap = plt.get_cmap("jet")
+    cluster_cmap = plt.get_cmap("cool")
+    #pred_cmap = plt.get_cmap("YlGnBu")
     pred_cmap = plt.get_cmap("RdYlGn_r")
     df = pd.DataFrame(X)
     vmin = -1
@@ -150,7 +151,8 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
     sys.stderr.write("Clustering methylation and CpG density\n")
     linkage = scipy.cluster.hierarchy.linkage(F,method=linkage_method,metric='euclidean')
     fcluster = scipy.cluster.hierarchy.fcluster(linkage,num_clusters,criterion='maxclust')
-    cluster_tags = [float(1)/ct for ct in fcluster] 
+    #cluster_tags = [float(1)/ct for ct in fcluster] 
+    cluster_tags = [float(ct % 2) for ct in fcluster] 
     uniq_clusters = list(set(fcluster))
     row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]      
     cluster_plot_helper(df,cluster_tags,row_colors,meth_cmap,linkage,ofn_meth,title,vmin,vmax)
@@ -162,7 +164,11 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
     vmax = 1
     hmC_cmap = sns.diverging_palette(240,10,n=15,as_cmap=True)  
     df = pd.DataFrame(C)
-    cluster_tags = [float(1)/ct for ct in fcluster]
+    #cluster_tags = [float(1)/ct for ct in fcluster]
+    cluster_tags = [float(ct % 2) for ct in fcluster]
+    #sys.stderr.write("\t\tct: " + str(len(fcluster)) + "\n")
+    #for ct in fcluster:
+        #sys.stderr.write("\t\tct: " + str(ct) + "," + str(ct % 2) + "\n")
     row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]  
     cluster_plot_helper(df,cluster_tags,row_colors,hmC_cmap,linkage,ofn_hmC,title,vmin,vmax)
 
@@ -233,8 +239,9 @@ def print_individual_cluster_averages_meth_hmC(uniq_clusters,fcluster,X,Y,C,Z,of
                 "; Expr. Dir: " + expression_direction +
                 "; purity: " + str(purity) +
                 "; num_genes: " + str(len(Ys)) + "\n")
-        cluster_labels = [l for i,l in enumerate(labels) if i in idx]
-        average_print_helper_meth_cpg(Xs,Cs,str(cluster),of_base,cluster_labels,purity,expression_direction,data_info,args)
+        if len(Xs) >= args.min_genes_per_cluster:
+            cluster_labels = [l for i,l in enumerate(labels) if i in idx]
+            average_print_helper_meth_cpg(Xs,Cs,str(cluster),of_base,cluster_labels,purity,expression_direction,data_info,args)
     return 0
 
 ##  # Look into adding this in the future as tsplot is going away...
@@ -475,5 +482,7 @@ in the interp_dir used as input.''')
         help="confidence interval [0,100] for aggregate cluster plots. (default: 95)")
     parser.add_argument('--max_y_value',default=0.4, type=float,
         help="max y-value for plots. (default: 0.4)")
+    parser.add_argument('--min_genes_per_cluster',default=10, type=int,
+        help="min number of genes needed in a cluster to print it (default: 10)")
     return parser
     
