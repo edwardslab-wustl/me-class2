@@ -60,7 +60,18 @@ def process_samples(interp_dir,tag):
             sample = Sample(sample_name,X,Y,C,P,M,E,Z,gene_id_list,data_info_X) 
             samples.append(sample) 
     return samples
-       
+
+def convert_coord_to_bin (lb, ub, data_info):
+    tssWin = data_info[0]
+    tssBins = data_info[1]
+    tssOffset = data_info[2]
+    bin_size = (tssWin /tssBins)
+    #sys.stderr.write("\tbinsize: " + str(bin_size) + "," + str(tssBins) + "\n")
+    lb_shift = lb + int(tssWin/2) - int(tssOffset/2)
+    ub_shift = ub + int(tssWin/2) - int(tssOffset/2)
+    lb_bin = int(lb_shift / bin_size)
+    ub_bin = int(ub_shift / bin_size)
+    return lb_bin, ub_bin
        
 def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):    
     linkage_method = 'complete'            
@@ -74,6 +85,7 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
     S = list()
     C = list()
     print_labels = list()
+    #assume default binning scheme if problems parsing it later
     tssWin = 10000
     tssBins = 500
     tssOffset = 0
@@ -84,7 +96,12 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
         sX = [x for i,x in enumerate(sample.X) if i in idx ]
         if len(sX)==0 or len(sX)==1:
             return
-        sXsub = [x[mi_lb:mi_ub] for i,x in enumerate(sample.X) if i in idx ]
+        if sample.data_info:
+            #sys.stderr.write("\tsample.data_info:" + str(sample.data_info[0]) + "," + str(sample.data_info[1]) + "," + str(sample.data_info[2])  + "\n")
+            data_info = sample.data_info
+        (mi_lb_bin, mi_ub_bin) = convert_coord_to_bin( mi_lb, mi_ub, data_info)
+        #sys.stderr.write("\tbins: " + str(mi_lb_bin) + "," + str(mi_ub_bin) + "\n")
+        sXsub = [x[mi_lb_bin:mi_ub_bin] for i,x in enumerate(sample.X) if i in idx ]
         sY = [y for i,y in enumerate(sample.Y) if i in idx ]
     #    P = [p for i,p in enumerate(sample.P) if i in idx ]
     #    L = [math.log(l,10) for i,l in enumerate(sample.L) if i in idx ]
@@ -93,7 +110,7 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
         sC = [c for i,c in enumerate(sample.C) if i in idx ]
         #sP = [p for i,p in enumerate(sample.P) if i in idx ]
         s_labels = ["\t".join((geneID,str(sample.Y[i]),str(sample.P[i]))) for i,geneID in enumerate(sample.geneIDs) if i in idx ]
-        sCsub = [c[mi_lb:mi_ub] for i,c in enumerate(sample.C) if i in idx ]
+        sCsub = [c[mi_lb_bin:mi_ub_bin] for i,c in enumerate(sample.C) if i in idx ]
         sS = [s for i in range(len(sX))]
         
         Y += sY
@@ -101,9 +118,6 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
         S += sS
         C += sC
         print_labels += s_labels
-        
-        if sample.data_info:
-            data_info = sample.data_info
         
         Xsub+=sXsub
         Csub+=sCsub
@@ -374,17 +388,18 @@ def load_vals(filename):
     for line in fh:
         if line.startswith("#"):
             #tssWin:10000,tssBins:500,tssOffset:0
-            match = re.match("tssWin:(\d+)",line)
+            match = re.search("tssWin:(\d+)",line)
             if match:
                 tssWin = int(match.group(1))
-            match = re.match("tssBins:(\d+)",line)
+            match = re.search("tssBins:(\d+)",line)
             if match:
                 tssBins = int(match.group(1))
-            match = re.match("tssOffset:(\d+)",line)
+            match = re.search("tssOffset:(\d+)",line)
             if match:
                 tssOffset = int(match.group(1))
             continue        
         X.append([float(x) for x in line.strip().split()])
+    #sys.stderr.write( "tssBins: " + str(tssBins) + "\n" )
     data_info = (tssWin, tssBins, tssOffset)
     return X,data_info  
     
