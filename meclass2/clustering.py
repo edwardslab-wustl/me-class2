@@ -461,10 +461,10 @@ in the interp_dir used as input.''')
     parser.add_argument('base',help="Base for output file names")
     parser.add_argument('--tag',
         help="tag to subset .pred files, e.g. if <>.RandomForestClassifier.5mC_5hmC.pred, then use tag=5mC_5hmC")
-    parser.add_argument('--upperBound',default=375,type=int,
-        help="upperBound of window for clustering in number of features. (default: 375)")
-    parser.add_argument('--lowerBound',default=225,type=int,
-        help="lowerBound of window for clustering in number of features. (default: 225)")
+    parser.add_argument('--upperBound',default=2500,type=int,
+        help="upperBound of window for clustering in number of features, in bp relative to TSS (default: 2500)")
+    parser.add_argument('--lowerBound',default=-500,type=int,
+        help="lowerBound of window for clustering in number of features, in bp relative to TSS (default: -500)")
     parser.add_argument('--upperPredBound',default=1.0,type=float,
         help="upper prediction score bound for clustering. (default: 1.0)")
     parser.add_argument('--lowerPredBound',default=0.7,type=float,
