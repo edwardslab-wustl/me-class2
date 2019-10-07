@@ -18,5 +18,5 @@ class Sample:
         self.E = np.asarray(E)
         self.Z = np.asarray(Z)
         self.geneIDs = geneIDs
-        self.data_info = data_info # tssWin, tssBins, tssOffset)
+        self.data_info = data_info # (tssWin, tssBins, tssOffset)
         

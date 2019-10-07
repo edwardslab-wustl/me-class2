@@ -26,10 +26,9 @@ def main():
     # Readin expression files
     #
     df1_expr = pd.read_table(args.file1, index_col=False, header=None, na_values='NA', names = ['gene_id_1', 'ave_expr_1'])
-    df1_expr = df2_expr.set_index('gene_id_1')
-    #
     df2_expr = pd.read_table(args.file2, index_col=False, header=None, na_values='NA', names = ['gene_id_2', 'ave_expr_2'])
-    df2_expr = df1_expr.set_index('gene_id_2')
+    df1_expr = df1_expr.set_index('gene_id_1')
+    df2_expr = df2_expr.set_index('gene_id_2')
     #
     if not args.turn_off_floor:
         #df1_expr['ave_expr_1']=df1_expr['ave_expr_1'].apply(floor)
@@ -68,7 +67,7 @@ def setup_parser_arguments():
     parser.add_argument('file2',help="RNA-seq results file from second sample.")
     parser.add_argument('output',help="Name of output file.")
     ### Optional arguments
-    parser.add_argument('-o','--output',help="Output file. Otherwise results are printed to stdout.")
+    #parser.add_argument('-o','--output',help="Output file. Otherwise results are printed to stdout.")
     parser.add_argument('-v','--verbose',action="store_true",help="Verbose output for troubleshooting.")
     parser.add_argument('--floor',default=5,help="Set expression values lower than this to this value. Default=5")
     parser.add_argument('--turn_off_floor',action="store_true",help="Do not floor the expression values.")

@@ -37,6 +37,16 @@ Prep RNA-seq data
 #################
 
 avg_rnaseq_data.py
-This script will take as input tab-delimited data files where at least one column is a gene ID and another is an expression column corresponding to multiple RNA-seq replicates and output a single file with the average methylation for each gene. This is a quick way to get values useful for fold-change calculations needed for ME-class2.
+This script will take as input tab-delimited data files where at least one column is a gene ID and another is an expression column corresponding to multiple RNA-seq replicates and output a single file with the average methylation for each gene. This is a quick way to get values useful for fold-change calculations needed for ME-Class2.
 
+combine_rnaseq.py
+This script takes a refSeq annotation file (from the UCSC Genome Browser) and two expression files as input.  It converts the gene IDs into RefSeq IDs, floors the expression values, and collates expression data from the two files to create a properly formatted .expr expression data file for ME-Class2 analysis.
+
+
+################################
+Combine Feature Importance Files
+################################
+
+avg_featureImportance_files.py
+This script takes multiple featureImportance files that are spit out using the --featureImportance flag of the meclass2_classifier, averages the values and computes the x-coordinate for each feature.
 
