@@ -7,8 +7,9 @@ def main():
     ### Grab argument variables
     args = parser.parse_args()
     #
-    df_gene_annot = pd.read_csv(args.refGene_file, sep='\t')
-    annot_columns = df_gene_annot.columns
+    df_gene_annot = pd.read_csv(args.refGene_file, sep='\t', header=None, comment='#', na_values='NA', \
+                    names = ['bin', 'name', 'chrom', 'strand', 'txStart', 'txEnd', 'cdsStart', 'cdsEnd', 'exonCount', 'exonStarts', 'exonEnds', 'score', 'name2', 'cdsStartStat', 'cdsEndStat', 'exonFrames'])
+    #annot_columns = df_gene_annot.columns
     #
     # Drop which are cdsStartStat != cmpl; cdsEndStat != cmpl
     index_to_drop = df_gene_annot[ (df_gene_annot['cdsStartStat'] != 'cmpl') |  (df_gene_annot['cdsEndStat'] != 'cmpl') ].index
@@ -24,17 +25,26 @@ def main():
     #
     # Readin expression files
     #
-    df2_expr = pd.read_table(args.file1, index_col=False, header=None, na_values='NA', names = ['gene_id_1', 'ave_expr_1'])
-    df2_expr = df2_expr.set_index('gene_id_1')
+    df1_expr = pd.read_table(args.file1, index_col=False, header=None, na_values='NA', names = ['gene_id_1', 'ave_expr_1'])
+    df1_expr = df2_expr.set_index('gene_id_1')
     #
-    df1_expr = pd.read_table(args.file2, index_col=False, header=None, na_values='NA', names = ['gene_id_2', 'ave_expr_2'])
-    df1_expr = df1_expr.set_index('gene_id_2')
+    df2_expr = pd.read_table(args.file2, index_col=False, header=None, na_values='NA', names = ['gene_id_2', 'ave_expr_2'])
+    df2_expr = df1_expr.set_index('gene_id_2')
     #
     if not args.turn_off_floor:
         #df1_expr['ave_expr_1']=df1_expr['ave_expr_1'].apply(floor)
         #df2_expr['ave_expr_2']=df2_expr['ave_expr_2'].apply(floor)
-        df2_expr['ave_expr_1']=df2_expr['ave_expr_1'].apply(floor)
-        df1_expr['ave_expr_2']=df1_expr['ave_expr_2'].apply(floor)
+        df1_expr['ave_expr_1']=df1_expr['ave_expr_1'].apply(floor)
+        df2_expr['ave_expr_2']=df2_expr['ave_expr_2'].apply(floor)
+
+        # Alternate way
+        # df1_expr.loc[df1_expr['ave_expr_1'] < 5, 'ave_expr_1'] = 5
+        # df2_expr.loc[df2_expr['ave_expr_2'] < 5, 'ave_expr_2'] = 5
+        #OR *Better*
+        # df1_expr['ave_expr_1'] = np.where( df1_expr['ave_expr_1'] < 5, 5, df1_expr['ave_expr_1'] )	
+        # df2_expr['ave_expr_2'] = np.where( df2_expr['ave_expr_2'] < 5, 5, df2_expr['ave_expr_2'] )
+
+	
     df_merged = pd.concat( [df_gene_annot, df1_expr, df2_expr], axis=1, join='inner') 
     #
     # Write output
@@ -70,6 +80,7 @@ def setup_parser_arguments():
 if __name__ == "__main__":
     import sys, argparse
     import pandas as pd
+    import numpy as np
 
     main()
 
