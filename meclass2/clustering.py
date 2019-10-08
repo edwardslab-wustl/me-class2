@@ -4,7 +4,9 @@ Created on Mon Dec 19 11:30:15 2016
 
 @author: cschlosberg & jredwards
 """
-   
+ 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 from meclass2.sample import Sample        
  
@@ -26,6 +28,7 @@ import sklearn.externals
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
+
 
 
 
