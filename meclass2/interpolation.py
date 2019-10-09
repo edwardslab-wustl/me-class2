@@ -1723,6 +1723,11 @@ For multiple types of gene level interpolation and scaling of WGBS methylation d
             help="Plot all interpolated curves in directory\
             <tag>_interp_curves. Default=False")
     plot_group.set_defaults(plot=False)
+    ### output arguments    
+    out_group = parser.add_argument_group(title='Output Arguments')
+    out_group.add_argument("--verbose",dest="verbose",action="store_true",
+            help="print verbose stderr such as warnings\
+            Default=False")
     return parser
 
 
