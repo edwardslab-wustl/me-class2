@@ -242,7 +242,7 @@ def print_individual_cluster_averages_meth_hmC(uniq_clusters,fcluster,X,Y,C,Z,of
                 "; Expr. Dir: " + expression_direction +
                 "; purity: " + str(purity) +
                 "; num_genes: " + str(len(Ys)) + "\n")
-        if len(Xs) >= args.min_genes_per_cluster:
+        if len(Xs) >= args.min_genes_per_cluster and purity >= args.min_cluster_purity:
             cluster_labels = [l for i,l in enumerate(labels) if i in idx]
             average_print_helper_meth_cpg(Xs,Cs,str(cluster),of_base,cluster_labels,purity,expression_direction,data_info,args)
     return 0
@@ -272,7 +272,7 @@ def print_individual_cluster_averages_meth_hmC(uniq_clusters,fcluster,X,Y,C,Z,of
 
 def average_print_helper_meth_cpg(Xs,Cs,cluster,base,labels,purity,expression_direction,data_info,args):
     df = list()    
-    sns.set(font_scale=2)
+    sns.set(font_scale=1.8)
     sns.set_style("ticks")
 
     plt.figure(figsize=(8,5)) 
@@ -315,7 +315,8 @@ def average_print_helper_meth_cpg(Xs,Cs,cluster,base,labels,purity,expression_di
     plt.ylabel(r'$\Delta$mCG/CG'+'\n'+r'$\Delta$hmCG/CG')
 
     sys.stderr.write("\tPlotting Aggregate 5mC/5hmC Cluster %s\n" % (cluster))
-    plt.tight_layout()
+    if args.tight_layout:
+        plt.tight_layout()
     plt.savefig(base+".meth_cpg.cluster_%s"%(cluster)+".png", bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close()
 
@@ -487,5 +488,9 @@ in the interp_dir used as input.''')
         help="max y-value for plots. (default: 0.4)")
     parser.add_argument('--min_genes_per_cluster',default=10, type=int,
         help="min number of genes needed in a cluster to print it (default: 10)")
+    parser.add_argument('--min_cluster_purity',default=0.75, type=float,
+        help="min purity of the cluster to print it (default: 0.75)")
+    parser.add_argument('--tight_layout', action='store_true',
+        help="May help with layout of cluster plots if the plot does not fill the figure (default: False)")
     return parser
     
