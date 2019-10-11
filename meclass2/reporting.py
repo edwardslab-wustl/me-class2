@@ -76,12 +76,12 @@ def set_matplotlib_params(args, version):
         return 0
 
 def print_high_acc_genes(results, args):
-    outFile = args.outFileBase + ".geneList.txt"
-    sys.stderr.write("writing high accuracy (>" + str(args.min_accuracy) + ") to " + outFile + "\n")
-    header="#PREDFILE\tSAMPLE\tGENE_ID\tGENE_NAME\tEXPR\tLABEL\tPRED_LABEL\tRF_SCORE\n"
-    fh = open(outFile, 'w')
-    fh.write(header)
     for result in results:
+        outFile = args.outFileBase + "." + result.legend + ".geneList.txt"
+        sys.stderr.write("writing high accuracy (>" + str(args.min_accuracy) + ") to " + outFile + "\n")
+        header="#PREDFILE\tSAMPLE\tGENE_ID\tGENE_NAME\tEXPR\tLABEL\tPRED_LABEL\tRF_SCORE\n"
+        fh = open(outFile, 'w')
+        fh.write(header)
         for line in result.pull_high_accuracy_genes():
             fh.write(line + "\n")
     fh.close()
@@ -234,7 +234,7 @@ def calculate_acc_rejectrate (results, type, args):
             numGenes_N_list.append(numGenes_N)
         if type == 'all':
             result.max_threshold_given_accuracy = max_threshold_given_accuracy
-            sys.stderr.write("\tmax_threshold_given_accuracy= %s\n" % max_threshold_given_accuracy)
+            sys.stderr.write("\t" + result.legend + ": max_threshold_given_accuracy= %s\n" % max_threshold_given_accuracy)
         result.acc_rejrate_accuracy = accuracy_list
         result.acc_rejrate_rejectRate = rejectRate_list
         result.acc_rejrate_numGenes_P = numGenes_P_list
