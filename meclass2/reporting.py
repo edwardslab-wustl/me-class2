@@ -234,7 +234,8 @@ def calculate_acc_rejectrate (results, type, args):
             numGenes_N_list.append(numGenes_N)
         if type == 'all':
             result.max_threshold_given_accuracy = max_threshold_given_accuracy
-            sys.stderr.write("\t" + result.legend + ": max_threshold_given_accuracy= %s\n" % max_threshold_given_accuracy)
+            tmp = 1 - max_threshold_given_accuracy
+            sys.stderr.write("\t" + result.legend + ": max_threshold_given_accuracy= %s\n" % tmp)
         result.acc_rejrate_accuracy = accuracy_list
         result.acc_rejrate_rejectRate = rejectRate_list
         result.acc_rejrate_numGenes_P = numGenes_P_list
