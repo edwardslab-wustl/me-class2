@@ -77,7 +77,7 @@ def convert_coord_to_bin (lb, ub, data_info):
     return lb_bin, ub_bin
        
 def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):    
-    linkage_method = 'complete'            
+    linkage_method = args.linkage_method           
     sys.stderr.write("bounds: %d, %d\n" % (mi_lb, mi_ub))
     sys.stderr.write("pred bounds: " + str(lpb) + "," + str(upb) + "\n")
     
@@ -126,9 +126,16 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
         Csub+=sCsub
     
     F = list()
-    ## Dumb hueristic for the number of clusters to print based on the number returned
-    for i,x in enumerate(Xsub):
-        F.append(x)
+
+    if args.cluster_data == 'meth_only':
+        for i,x in enumerate(Xsub):
+            F.append(x)
+    elif args.cluster_data == 'hmC_only':
+        for i,x in enumerate(Csub):
+            F.append(x)
+    else:
+        for i,x in enumerate(Xsub):
+            F.append(x + Csub[i])
     F = sklearn.preprocessing.normalize(F)
     
     if cp:
@@ -158,7 +165,7 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
     cluster_tags = [float(ct % 2) for ct in fcluster] 
     uniq_clusters = list(set(fcluster))
     row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]      
-    cluster_plot_helper(df,cluster_tags,row_colors,meth_cmap,linkage,ofn_meth,title,vmin,vmax)
+    cluster_plot_helper(df,cluster_tags,row_colors,meth_cmap,linkage,ofn_meth,title,vmin,vmax,args)
     
 ### 5hmC plot    
     title = "Differential 5hmC"
@@ -173,7 +180,7 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
     #for ct in fcluster:
         #sys.stderr.write("\t\tct: " + str(ct) + "," + str(ct % 2) + "\n")
     row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]  
-    cluster_plot_helper(df,cluster_tags,row_colors,hmC_cmap,linkage,ofn_hmC,title,vmin,vmax)
+    cluster_plot_helper(df,cluster_tags,row_colors,hmC_cmap,linkage,ofn_hmC,title,vmin,vmax,args)
 
 
 ### Group all plots together 
@@ -193,9 +200,10 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
         
     return       
        
-def cluster_plot_helper(df,cluster_tags,row_colors,val_cmap,linkage,ofn,title,vmin,vmax):
+def cluster_plot_helper(df,cluster_tags,row_colors,val_cmap,linkage,ofn,title,vmin,vmax,args):
     sys.stderr.write("Plotting %s\n"%ofn)    
-    linkage_method = "complete"
+    #linkage_method = "complete"
+    linkage_method = args.linkage_method
     sns.set(style="white")
     sns.clustermap(df, row_colors=row_colors,col_cluster = False,\
                            figsize=(35,25),  method=linkage_method, row_linkage=linkage,\
@@ -472,6 +480,10 @@ in the interp_dir used as input.''')
     parser.add_argument('base',help="Base for output file names")
     parser.add_argument('--tag',
         help="tag to subset .pred files, e.g. if <>.RandomForestClassifier.5mC_5hmC.pred, then use tag=5mC_5hmC")
+    parser.add_argument('--cluster_data', default="both", choices=["meth_only", "hmC_only", "both"],
+        help="which signatures/data to cluster based on. (default: both)")
+    parser.add_argument('--linkage_method', default="complete", choices=["single", "complete", "average", "weighted", "ward", "median", "centroid"],
+        help="linkage method for clustering. See scipy.cluster.hierarchy.linkage online documentation for more info. (default: complete)")
     parser.add_argument('--upperBound',default=2500,type=int,
         help="upperBound of window for clustering in number of features, in bp relative to TSS (default: 2500)")
     parser.add_argument('--lowerBound',default=-500,type=int,
