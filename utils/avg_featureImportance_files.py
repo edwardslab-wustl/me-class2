@@ -44,7 +44,7 @@ def main():
             #
             fi_value_ave = 0
             for line in fi_file_lines:
-                fi_value_ave = fi_value_ave + float( (line.strip().split())[tssbins + feat_shift] )
+                fi_value_ave = fi_value_ave + float( (line.strip().split())[tssbins + feat_shift*num_tss_bins] )
             fi_value_ave = fi_value_ave / len(fi_file_lines)
             output_lines.append( str( int( (tssbins)*bin_size - (num_tss_wins/2 + tss_offset) ) ) + '\t' + str( fi_value_ave ) + '\n')
 
