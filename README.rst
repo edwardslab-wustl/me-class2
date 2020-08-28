@@ -5,12 +5,12 @@ Installation
 ============
 Using pip::
 
-    download meclass2-0.1.0.tar.gz
-    pip install meclass2-0.1.0.tar.gz
+    download meclass2-0.2.0.tar.gz
+    pip install meclass2-0.2.0.tar.gz
 
 For a user-specific install use --user flag::
 
-    pip install --user meclass2-0.1.0.tar.gz
+    pip install --user meclass2-0.2.0.tar.gz
 
 
 Required packages
