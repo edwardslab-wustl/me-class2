@@ -255,29 +255,6 @@ def print_individual_cluster_averages_meth_hmC(uniq_clusters,fcluster,X,Y,C,Z,of
             average_print_helper_meth_cpg(Xs,Cs,str(cluster),of_base,cluster_labels,purity,expression_direction,data_info,args)
     return 0
 
-##  # Look into adding this in the future as tsplot is going away...
-##
-##  #boot strap and tsplotboot code from: https://stackoverflow.com/questions/47581672/replacement-for-deprecated-tsplot
-##  def bootstrap(data, n_boot=10, ci=68):
-##      boot_dist = []
-##      for i in range(int(n_boot)):
-##          sys.stderr.write("\ton bootstrap interation %d\n" % (i))
-##          resampler = np.random.randint(0, data.shape[0], data.shape[0])
-##          sample = data.take(resampler, axis=0)
-##          boot_dist.append(np.mean(sample, axis=0))
-##      b = np.array(boot_dist)
-##      s1 = np.apply_along_axis(scipy.stats.scoreatpercentile, 0, b, 50.-ci/2.)
-##      s2 = np.apply_along_axis(scipy.stats.scoreatpercentile, 0, b, 50.+ci/2.)
-##      return (s1,s2)
-##  
-##  def tsplotboot(ax, data, ci, **kw):
-##      x = np.arange(data.shape[1])
-##      est = np.mean(data, axis=0)
-##      cis = bootstrap(data,ci=ci)
-##      ax.fill_between(x,cis[0],cis[1],alpha=0.2, **kw)
-##      ax.plot(x,est,**kw)
-##      ax.margins(x=0)
-
 def average_print_helper_meth_cpg(Xs,Cs,cluster,base,labels,purity,expression_direction,data_info,args):
     df = list()    
     sns.set(font_scale=1.8)
@@ -290,9 +267,14 @@ def average_print_helper_meth_cpg(Xs,Cs,cluster,base,labels,purity,expression_di
             df.append([j,i,Cs[i][j],r'$\Delta$hmCG/CG'])
             df.append([j,i,y+Cs[i][j],r'$\Delta$mCG/CG+$\Delta$hmCG/CG'])
     df = pd.DataFrame(df)
-    df.columns = [0,1,2,"signal"]
     ci = args.confidence_interval
-    ax = sns.tsplot(df,time=0,unit=1,value=2,condition="signal",ci=ci)
+    #tsplot was replaced by lineplot in seaborn 0.9
+    if "tsplot" in dir(sns):
+        df.columns = [0,1,2,"signal"]
+        ax = sns.tsplot(df,time=0,unit=1,value=2,condition="signal",ci=ci)
+    else:
+        df.columns = ["loc","dummy","meth","signal"]
+        ax = sns.lineplot(data=df,x='loc',y='meth',hue="signal",ci=ci)
 
     max_x_val = Xs.shape[1]
     max_y_val = args.max_y_value
