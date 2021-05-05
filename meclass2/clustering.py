@@ -33,7 +33,7 @@ from matplotlib.ticker import MultipleLocator
 
 
 
-def process_samples(interp_dir,tag):    
+def process_samples(interp_dir,tag,args):    
     samples = list()
     for x in os.listdir(interp_dir):
         if x.endswith(".meth.dat"):
@@ -47,11 +47,13 @@ def process_samples(interp_dir,tag):
                 pred_path = os.path.join(interp_dir,sample_name+".RandomForestClassifier." + tag +".pred")
             hmC_path = os.path.join(interp_dir,sample_name+".tss.hmC.dat")
             if not os.path.isfile(hmC_path):
-                sys.stderr.write("\nERROR: Can't find matching hmC dat file for \
+                sys.stderr.write("\nWARNING: Can't find matching hmC dat file for \
                         %s: %s\nThis should have been generated during \
                         interpolation, if you interpolated both 5mC and \
                         5hmC.\n\n" % (x,hmC_path))
-                callHelp(parser)
+                hmC_path = dat_path
+                args.cluster_data = 'meth_only'
+                #callHelp(parser)
             if not os.path.isfile(pred_path):
                 sys.stderr.write("\nERROR: Can't find matching pred file for %s: %s\n\n" % (x,pred_path))
                 callHelp(parser)
@@ -146,41 +148,43 @@ def all_sample_clustering(tag,samples,lpb,upb,cp,mi_ub,mi_lb,num_clusters,args):
 
     
 ### Methylation plot
-    title = "Differential Methylation"
-    ofn_meth = of_base+".meth.clustermap.png"
-    norm_Y = normalize_expression(Y) 
-    meth_cmap = sns.diverging_palette(240,10,n=15,as_cmap=True)            
-    sample_cmap = plt.get_cmap("gnuplot2")
-    sample_tags = [float(1)/(s+1) for s in S]    
-    cluster_cmap = plt.get_cmap("cool")
-    #pred_cmap = plt.get_cmap("YlGnBu")
-    pred_cmap = plt.get_cmap("RdYlGn_r")
-    df = pd.DataFrame(X)
-    vmin = -1
-    vmax = 1
-    sys.stderr.write("Clustering methylation and CpG density\n")
-    linkage = scipy.cluster.hierarchy.linkage(F,method=linkage_method,metric='euclidean')
-    fcluster = scipy.cluster.hierarchy.fcluster(linkage,num_clusters,criterion='maxclust')
-    #cluster_tags = [float(1)/ct for ct in fcluster] 
-    cluster_tags = [float(ct % 2) for ct in fcluster] 
-    uniq_clusters = list(set(fcluster))
-    row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]      
-    cluster_plot_helper(df,cluster_tags,row_colors,meth_cmap,linkage,ofn_meth,title,vmin,vmax,args)
+    if args.cluster_data != 'hmC_only':
+        title = "Differential Methylation"
+        ofn_meth = of_base+".meth.clustermap.png"
+        norm_Y = normalize_expression(Y) 
+        meth_cmap = sns.diverging_palette(240,10,n=15,as_cmap=True)            
+        sample_cmap = plt.get_cmap("gnuplot2")
+        sample_tags = [float(1)/(s+1) for s in S]    
+        cluster_cmap = plt.get_cmap("cool")
+        #pred_cmap = plt.get_cmap("YlGnBu")
+        pred_cmap = plt.get_cmap("RdYlGn_r")
+        df = pd.DataFrame(X)
+        vmin = -1
+        vmax = 1
+        sys.stderr.write("Clustering methylation and CpG density\n")
+        linkage = scipy.cluster.hierarchy.linkage(F,method=linkage_method,metric='euclidean')
+        fcluster = scipy.cluster.hierarchy.fcluster(linkage,num_clusters,criterion='maxclust')
+        #cluster_tags = [float(1)/ct for ct in fcluster] 
+        cluster_tags = [float(ct % 2) for ct in fcluster] 
+        uniq_clusters = list(set(fcluster))
+        row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]      
+        cluster_plot_helper(df,cluster_tags,row_colors,meth_cmap,linkage,ofn_meth,title,vmin,vmax,args)
     
 ### 5hmC plot    
-    title = "Differential 5hmC"
-    ofn_hmC = of_base+".hmC.clustermap.png"
-    vmin = -1
-    vmax = 1
-    hmC_cmap = sns.diverging_palette(240,10,n=15,as_cmap=True)  
-    df = pd.DataFrame(C)
-    #cluster_tags = [float(1)/ct for ct in fcluster]
-    cluster_tags = [float(ct % 2) for ct in fcluster]
-    #sys.stderr.write("\t\tct: " + str(len(fcluster)) + "\n")
-    #for ct in fcluster:
-        #sys.stderr.write("\t\tct: " + str(ct) + "," + str(ct % 2) + "\n")
-    row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]  
-    cluster_plot_helper(df,cluster_tags,row_colors,hmC_cmap,linkage,ofn_hmC,title,vmin,vmax,args)
+    if args.cluster_data != "meth_only":
+        title = "Differential 5hmC"
+        ofn_hmC = of_base+".hmC.clustermap.png"
+        vmin = -1
+        vmax = 1
+        hmC_cmap = sns.diverging_palette(240,10,n=15,as_cmap=True)  
+        df = pd.DataFrame(C)
+        #cluster_tags = [float(1)/ct for ct in fcluster]
+        cluster_tags = [float(ct % 2) for ct in fcluster]
+        #sys.stderr.write("\t\tct: " + str(len(fcluster)) + "\n")
+        #for ct in fcluster:
+            #sys.stderr.write("\t\tct: " + str(ct) + "," + str(ct % 2) + "\n")
+        row_colors = [sample_cmap(sample_tags),pred_cmap(norm_Y),cluster_cmap(cluster_tags)]  
+        cluster_plot_helper(df,cluster_tags,row_colors,hmC_cmap,linkage,ofn_hmC,title,vmin,vmax,args)
 
 
 ### Group all plots together 
@@ -263,9 +267,14 @@ def average_print_helper_meth_cpg(Xs,Cs,cluster,base,labels,purity,expression_di
     plt.figure(figsize=(8,5)) 
     for i,x in enumerate(Xs):      
         for j,y in enumerate(x):        
-            df.append([j,i,y,r'$\Delta$mCG/CG'])
-            df.append([j,i,Cs[i][j],r'$\Delta$hmCG/CG'])
-            df.append([j,i,y+Cs[i][j],r'$\Delta$mCG/CG+$\Delta$hmCG/CG'])
+            if args.cluster_data == 'meth_only':
+                df.append([j,i,y,r'$\Delta$mCG/CG'])
+            elif args.cluster_data == '5hmC_only':
+                df.append([j,i,Cs[i][j],r'$\Delta$hmCG/CG'])
+            else:
+                df.append([j,i,y,r'$\Delta$mCG/CG'])
+                df.append([j,i,Cs[i][j],r'$\Delta$hmCG/CG'])
+                df.append([j,i,y+Cs[i][j],r'$\Delta$mCG/CG+$\Delta$hmCG/CG'])
     df = pd.DataFrame(df)
     ci = args.confidence_interval
     #tsplot was replaced by lineplot in seaborn 0.9
@@ -302,7 +311,12 @@ def average_print_helper_meth_cpg(Xs,Cs,cluster,base,labels,purity,expression_di
     #ax.legend_.remove()
     lgd=plt.legend(loc=5,bbox_to_anchor=(1.7,0.5),handlelength=1,handletextpad=0.5)
     plt.xlabel("Position relative to TSS (bp)")
-    plt.ylabel(r'$\Delta$mCG/CG'+'\n'+r'$\Delta$hmCG/CG')
+    if args.cluster_data == 'meth_only':
+        plt.ylabel(r'$\Delta$mCG/CG')
+    elif args.cluster_data == 'hmC_only':
+        plt.ylabel(r'$\Delta$hmCG/CG')
+    else:
+        plt.ylabel(r'$\Delta$mCG/CG'+'\n'+r'$\Delta$hmCG/CG')
 
     sys.stderr.write("\tPlotting Aggregate 5mC/5hmC Cluster %s\n" % (cluster))
     if args.tight_layout:

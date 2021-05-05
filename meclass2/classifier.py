@@ -55,6 +55,7 @@ import sklearn.externals
 ### Function Definitions below here
 
 def crossfold_evaluation(samples, args):
+    meth_type = args.type
     X_data = list()
     Y_data = list()
     Z_data = list()
@@ -81,7 +82,6 @@ def crossfold_evaluation(samples, args):
     sys.stderr.write("Training %s for %s crossfold validation\n" %
             (func_name,n_folds))
     ### Need to perform Leave-one-fold-out CV to compare.
-    meth_type = args.type
     if meth_type == "5mC_5hmC":
         trainData = np.concatenate((X_data,Z_data),axis=1)
     elif meth_type == "5mC":
@@ -267,7 +267,7 @@ def expression_prediction_loso(M_train,Y_train,I_train,Z_train,M_test,Y_test,I_t
     ofh.close()
     return
 
-def load_samples(interp_dir):
+def load_samples(interp_dir,args):
     samples = list()
     for f in os.listdir(interp_dir):
         #if f.endswith(".tss.meth.dat"):
@@ -281,7 +281,10 @@ def load_samples(interp_dir):
             dat_path = os.path.join(interp_dir,f)
             label_path = os.path.join(interp_dir,sample_name+".label")
             #hmC_path = os.path.join(interp_dir,sample_name+".tss.hmC.dat")
-            hmC_path = os.path.join(interp_dir,base+".hmC.dat")
+            if args.type == '5mC':
+                hmC_path = os.path.join(interp_dir,base+".meth.dat") #quick hack to ignore 5hmC file if doing 5mC only
+            else:
+                hmC_path = os.path.join(interp_dir,base+".hmC.dat")
             Y,L,E,I = load_multilabel_expr(label_path)
             X = load_vals(dat_path)
             Z = load_vals(hmC_path)
@@ -290,7 +293,6 @@ def load_samples(interp_dir):
             print_label_counter(sample.Y)
     return samples
    
-    
 def print_label_counter(Y):
     counter = collections.Counter(Y)
     for k in sorted(counter.keys()):

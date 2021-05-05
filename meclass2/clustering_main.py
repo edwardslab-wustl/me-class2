@@ -22,7 +22,7 @@ def main():
     low_pred_bound = float(args.lowerPredBound)
     high_pred_bound = float(args.upperPredBound)
     corr_pred = 1
-    samples = meclass2.clustering.process_samples(args.interp_dir,args.tag) 
+    samples = meclass2.clustering.process_samples(args.interp_dir,args.tag,args) 
     meclass2.clustering.all_sample_clustering(args.base,samples,low_pred_bound,high_pred_bound,corr_pred,int(args.upperBound),int(args.lowerBound),int(args.numClusters),args)
  
 if __name__ == '__main__':

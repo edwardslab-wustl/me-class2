@@ -14,7 +14,7 @@ def main():
     parser = meclass2.classifier.setup_parser_arguments()
     ### Grab argument variables
     args = parser.parse_args()  
-    samples = meclass2.classifier.load_samples(args.interp_dir)
+    samples = meclass2.classifier.load_samples(args.interp_dir,args)
     #sys.stderr.write("sample length: %s\n" % str(len(samples)))
     if len(samples) > 1:
         meclass2.classifier.loso_evaluation(samples,args)    
