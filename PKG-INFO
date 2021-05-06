@@ -1,0 +1,18 @@
+Metadata-Version: 1.2
+Name: me-class2
+Version: 0.3.0
+Summary: Deconvolution of Methylation Sequencing Data
+Home-page: UNKNOWN
+Author: Chris Schlosberg
+Author-email: chris.schlosberg@gmail.com
+Maintainer: John Edwards
+Maintainer-email: jredwards@wustl.edu
+License: GPLv3
+Description: Integrative analysis of DNA methylation and expression data. Can integrate 5mC and/or 5hmC data.
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: POSIX
+Classifier: Topic :: Science/Engineering :: Bio-Informatics
+Classifier: Programming Language :: Python :: 3.5
