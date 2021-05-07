@@ -233,11 +233,12 @@ def expression_prediction_loso(M_train,Y_train,I_train,Z_train,M_test,Y_test,I_t
     ### Randomly split indexes
     if args.strat_kfold:
         #kf = sklearn.cross_validation.StratifiedKFold(Y_test,n_folds=n_folds,shuffle=True)
-        kf = sklearn.cross_validation.StratifiedKFold(Y_test,n_splits=n_folds,shuffle=True)
+        #kf = sklearn.cross_validation.StratifiedKFold(Y_test,n_splits=n_folds,shuffle=True)
+        kf = sklearn.cross_validation.StratifiedKFold(n_splits=n_folds,shuffle=True)
     else:
         #kf = sklearn.cross_validation.KFold(len(Y_test),n_folds=n_folds,shuffle=True)
-        kf = sklearn.model_selection.KFold(len(Y_test),n_splits=n_folds,shuffle=True)
-    for train_idx,test_idx in kf:    
+        kf = sklearn.model_selection.KFold(n_splits=n_folds,shuffle=True)
+    for train_idx,test_idx in kf.split(Y_test):    
         I_kf_test = I_test[test_idx]
         I_kf_test_set = set(I_kf_test.tolist())
         X_train_loo = list()
