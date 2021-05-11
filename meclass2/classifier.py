@@ -238,7 +238,10 @@ def expression_prediction_loso(M_train,Y_train,I_train,Z_train,M_test,Y_test,I_t
     else:
         #kf = sklearn.cross_validation.KFold(len(Y_test),n_folds=n_folds,shuffle=True)
         kf = sklearn.model_selection.KFold(n_splits=n_folds,shuffle=True)
+    fold = 0
     for train_idx,test_idx in kf.split(Y_test):    
+        fold += 1
+        sys.stderr.write("\tNow on fold %s.\n" % fold)
         I_kf_test = I_test[test_idx]
         I_kf_test_set = set(I_kf_test.tolist())
         X_train_loo = list()
@@ -254,6 +257,8 @@ def expression_prediction_loso(M_train,Y_train,I_train,Z_train,M_test,Y_test,I_t
                     Y_train_loo.append(Y_train[j])
         X_train_loo = np.array(X_train_loo)
         Y_train_loo = np.array(Y_train_loo)
+        sys.stderr.write("\t\tnumber of training examples: %s\n" %
+                (len(X_train_loo)))
         method.fit(X_train_loo,Y_train_loo)
         X_test_loo = X_test[test_idx]
         Y_pred_prob_el= method.predict_proba(X_test_loo)
@@ -261,6 +266,12 @@ def expression_prediction_loso(M_train,Y_train,I_train,Z_train,M_test,Y_test,I_t
         for j,y_pred in enumerate(Y_pred_el):
             Y_pred_prob[test_idx[j]] = Y_pred_prob_el[j]
             Y_pred[test_idx[j]] = y_pred            
+        if args.featureImportance:
+            sys.stderr.write("\t\tprinting features importances\n")
+            featImp = "\t".join(method.feature_importances_.astype(str))
+            featImp_H = open(".".join([sample_name,func_name,meth_type,str(fold),"featureImportance"]),'w')
+            featImp_H.write(featImp + "\n")
+            featImp_H.close()
     ofh = open(".".join([sample_name,func_name,meth_type,"pred"]),'w')  
     for j,p in enumerate(Y_pred_prob):
         l = [str(x) for x in p]
