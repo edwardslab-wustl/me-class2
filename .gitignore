@@ -11,3 +11,13 @@
 
 /__pycache__/
 
+# custom
+HRPS*
+*.stderr
+cluster.lb*
+sample_data*
+predictions.txt
+refGene_sample.txt
+example_data/*
+.DS_Store
+

@@ -29,9 +29,15 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-
-
-
+class recursion_depth:
+# from : https://www.codingem.com/python-maximum-recursion-depth/
+    def __init__(self, limit):
+        self.limit = limit
+        self.default_limit = sys.getrecursionlimit()
+    def __enter__(self):
+        sys.setrecursionlimit(self.limit)
+    def __exit__(self, type, value, traceback):
+        sys.setrecursionlimit(self.default_limit)
 
 def process_samples(interp_dir,tag,args):    
     samples = list()
@@ -209,11 +215,12 @@ def cluster_plot_helper(df,cluster_tags,row_colors,val_cmap,linkage,ofn,title,vm
     #linkage_method = "complete"
     linkage_method = args.linkage_method
     sns.set(style="white")
-    sns.clustermap(df, row_colors=row_colors,col_cluster = False,\
-                           figsize=(35,25),  method=linkage_method, row_linkage=linkage,\
-                           cmap=val_cmap, linewidths = 0,\
-                           xticklabels=False,yticklabels=False,\
-                           vmin = vmin, vmax = vmax)
+    with recursion_depth(5000)
+        sns.clustermap( df, row_colors=row_colors,col_cluster = False,
+                           figsize=(35,25),  method=linkage_method, row_linkage=linkage,
+                           cmap=val_cmap, linewidths = 0,
+                           xticklabels=False,yticklabels=False,
+                           vmin = vmin, vmax = vmax )
     plt.title(title)
     plt.savefig(ofn)
     plt.close()   
