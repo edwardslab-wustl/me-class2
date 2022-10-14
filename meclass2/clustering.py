@@ -215,7 +215,7 @@ def cluster_plot_helper(df,cluster_tags,row_colors,val_cmap,linkage,ofn,title,vm
     #linkage_method = "complete"
     linkage_method = args.linkage_method
     sns.set(style="white")
-    with recursion_depth(5000)
+    with recursion_depth(5000):
         sns.clustermap( df, row_colors=row_colors,col_cluster = False,
                            figsize=(35,25),  method=linkage_method, row_linkage=linkage,
                            cmap=val_cmap, linewidths = 0,
