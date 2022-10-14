@@ -4,7 +4,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends git \
     && apt-get clean
 
-ADD https://api.github.com/repos/edwardslab-wustl/me-class2/git/refs/heads/main version.json
+ADD https://api.github.com/repos/edwardslab-wustl/me-class2/git/refs/heads/main/version.json
 RUN /opt/conda/bin/python3 -m pip install git+https://github.com/edwardslab-wustl/me-class2.git
 
 RUN mkdir -p /usr/local/meclass2 
