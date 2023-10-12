@@ -1337,8 +1337,9 @@ def load_gene_annot(annot_file,valid_chr):
         genes = filter_duplicate_tx_starts(genes,filter_counts)
     # Report 1 common gene per multiple REFSEQ IDs only
     if filter_flags.collapse_on_common_name:
-        sys.stderr.write("Collapsing genes with multiple REFSEQ IDs per common gene name\n")
-        genes = collapse_genes_by_common_name(genes,filter_counts)
+        sys.stderr.write("SKIP: Collapsing genes with multiple REFSEQ IDs per common gene name\n")
+        #sys.stderr.write("Collapsing genes with multiple REFSEQ IDs per common gene name\n")
+        #genes = collapse_genes_by_common_name(genes,filter_counts)
     # Exclude genes with less than 4 exons
     if filter_flags.exclude_lt_four_exons:
         sys.stderr.write("Excluding genes with < 4 exons\n")
@@ -1610,7 +1611,7 @@ def setup_parser_arguments():
     global parser
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,description='''
-For multiple types of gene level interpolation and scaling of WGBS methylation data.''')
+For multiple types of gene level interpolation and scaling of WGBS methylation data. Special version for Rafael with noi common gene name filter.''')
     ### Required positional arguments
 #    parser.add_argument('bedgraph',help="Sample bedgraph or DMR (DSS) output file")
     parser.add_argument('bedgraph',help="Sample bedgraph output file")

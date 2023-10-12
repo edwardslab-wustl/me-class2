@@ -5,7 +5,7 @@ RUN apt-get update \
     && apt-get clean
 
 ADD https://api.github.com/repos/edwardslab-wustl/me-class2/git/refs/heads/main/version.json
-RUN /opt/conda/bin/python3 -m pip install git+https://github.com/edwardslab-wustl/me-class2.git
+RUN /opt/conda/bin/python3 -m pip install git+https://github.com/edwardslab-wustl/me-class2.git@RF
 
 RUN mkdir -p /usr/local/meclass2 
 ADD example_data.tgz /usr/local/meclass2
